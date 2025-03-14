@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>نظام إدارة غسيل السيارات</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-section,
+        .table-section {
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        form input[type="text"],
+        form input[type="tel"] {
+            width: calc(100% - 12px);
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #blue {
+            background-color: #008CBA;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /*=== MESSAGE STYLING ===*/
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>نظام مغاسل خمسة عناية لخدمة السيارات
+        </h1>
+        <!-- <a href="{% url 'admin:index' %}" id="blue">لوحةالتحكم</a> -->
+
+        <div class="form-section">
+            <h2>إضافة عميل جديد</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="clientName">اسم العميل:</label>
+                <input type="text" name="name" id="clientName" required><br><br>
+
+                <label for="carPlate">رقم لوحة السيارة:</label>
+                <input type="text" name="vehicle_plate" id="carPlate" required><br><br>
+
+                <label for="phoneNumber">رقم الجوال:</label>
+                <input type="tel" name="phone" id="phoneNumber" required><br><br>
+
+                <button type="submit">إضافة عميل</button>
+            </form>
+        </div>
+
+        <div class="table-section">
+            <h2>قائمة العملاء</h2>
+            <!--=== Display messages ===-->
+            {% if messages %}
+            <div>
+                {% for message in messages %}
+                <div{% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %}>
+                    {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <table id="clientsTable">
+            <thead>
+                <tr>
+                    <th>اسم العميل</th>
+                    <th>رقم لوحة السيارة</th>
+                    <th>رقم الجوال</th>
+                    <th>عدد الغسلات</th>
+                    <th>إجراء غسيل</th>
+                    <th>إعادة الحساب</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.vehicle_plate }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.washcount }}</td>
+                    <td>
+                        <form action="{% url 'wash_count' client.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" id="blue">غسيل</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% url 'reset_count' client.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" id="blue">إعادة الحساب</button>
+                        </form>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+</body>
+
+</html>
